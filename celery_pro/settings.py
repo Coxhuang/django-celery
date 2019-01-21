@@ -77,9 +77,17 @@ WSGI_APPLICATION = 'celery_pro.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'celery_db',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 
@@ -106,7 +114,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -124,17 +133,15 @@ STATIC_URL = '/static/'
 
 import djcelery
 from celery.schedules import crontab
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 djcelery.setup_loader()
 BROKER_URL = 'redis://127.0.0.1:6379/0'
-
-
 from datetime import timedelta
-
-
 CELERYBEAT_SCHEDULE = {
     'celery_test': {
         'task': 'app.tasks.test_celery',
-        'schedule': timedelta(seconds=3),
+        # 'schedule': timedelta(seconds=3),
+        'schedule': crontab(minute='*/1'),
         'args': (16, 16)
     },
 }
